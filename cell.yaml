@@ -1,0 +1,60 @@
+# Transactions cell: one of the ten finance services split from the retired finance_* tables (2026-10-12).
+# Money in and out of an account (account_id from finance-accounts; subscription_id from subscriptions).
+# Amounts are real (float) like every kit cell; cross-cell ids (account_id, ...) are plain bigints, not foreign keys.
+cell: transactions
+title: Transactions
+resources:
+  transaction:
+    filters:
+    - account_id
+    - category
+    - transaction_type
+    - owner_scope
+    order: transaction_date
+    fields:
+      transaction_date:
+        type: date
+        required: true
+      transaction_type:
+        type: enum
+        values:
+        - income
+        - expense
+        - transfer
+        - refund
+        - fee
+        - adjustment
+        required: true
+      amount:
+        type: real
+        min: 0
+        required: true
+      currency:
+        type: text
+        default: THB
+        max_length: 12
+      account_id:
+        type: bigint
+      owner_scope:
+        type: enum
+        values:
+        - personal
+        - solo_empire
+        - venture
+        - client
+        - shared
+        default: personal
+      category:
+        type: text
+      merchant:
+        type: text
+      description:
+        type: text
+      source:
+        type: text
+        default: manual
+      subscription_id:
+        type: bigint
+      metadata:
+        type: json
+        json: object
