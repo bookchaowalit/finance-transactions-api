@@ -1,5 +1,4 @@
-# transactions
-
+# finance-transactions-api
 The Transactions cell: its own API (Railway, serverless) and its own Neon
 database, first generated from `cell.yaml` (one of the ten finance
 services split on 2026-10-12). It
@@ -8,8 +7,8 @@ HTTP with the caller's token.
 
 | | |
 |---|---|
-| API | Railway project `transactions`, service `transactions-api` (Serverless) |
-| Data | Neon project `transactions`, database `transactions` |
+| API | Railway project `finance-transactions-api`, service `transactions-api` (Serverless) |
+| Data | Neon project `finance-transactions-api`, database `transactions` |
 | Registry | solo-empire `repository-catalog/registries/online-systems.yaml` (`transactions`) |
 
 ## API
