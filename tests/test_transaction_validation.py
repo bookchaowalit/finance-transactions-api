@@ -42,10 +42,12 @@ def test_currency_code_is_at_most_12_characters(client, owner):
     assert create(client, owner, currency="USD").status_code == 201
 
 
-def test_owner_scope_must_be_a_known_scope(client, owner):
-    assert create(client, owner, owner_scope="nobody").status_code == 422
-    for scope in ("personal", "solo_empire", "venture", "client", "shared"):
-        assert create(client, owner, owner_scope=scope).status_code == 201
+def test_scope_is_a_free_label_of_at_most_64_characters(client, owner):
+    labelled = create(client, owner, scope="family")
+    assert labelled.status_code == 201, labelled.text
+    assert labelled.json()["scope"] == "family"
+    assert create(client, owner, scope="x" * 65).status_code == 422
+    assert create(client, owner, owner_scope="venture").status_code == 422
 
 
 def test_metadata_must_be_an_object(client, owner):

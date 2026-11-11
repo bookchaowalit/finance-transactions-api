@@ -19,11 +19,11 @@ api
 ## Product Purpose
 
 The ledger of money in and out: one record per income, expense, transfer, refund, fee or
-adjustment, with its date, amount, currency, owner scope, category and merchant, and the account
+adjustment, with its date, amount, currency, scope label, category and merchant, and the account
 and subscription it belongs to.
 
 Success: every movement of money is recorded once with a non-negative amount and a known type,
-and it can be listed by account, category, type or owner scope.
+and it can be listed by account, category, type or scope label.
 
 ## Positioning
 
@@ -41,15 +41,17 @@ workspace-scoped, so the same service can serve other tenants without code chang
 
 ## Capabilities and Constraints
 
-- `/v1/transactions`: list (filters `account_id`, `category`, `transaction_type`, `owner_scope`;
+- SPEC-003: amounts are exact `money` (`numeric(19,4)`) and quantities, unit prices and rates are
+  `decimal` (`numeric(30,10)`); both are JSON strings in responses (`"1234.5600"`). Currency fields
+  are ISO 4217 codes (three upper-case letters). `scope` is a free label the workspace defines (at
+  most 64 characters, default empty).
+- `/v1/transactions`: list (filters `account_id`, `category`, `transaction_type`, `scope`;
   ordered by `transaction_date`, then id; `order=desc` reverses), stats (`group_by` one of those
   filters), get, get-by-legacy-id, create (with `Idempotency-Key`), patch (with
   `expected_version`), delete.
 - Rules: `transaction_date`, `transaction_type` and `amount` are required; `transaction_type` is
   one of income, expense, transfer, refund, fee, adjustment; `amount` cannot be negative (zero is
-  allowed, the direction comes from the type); `currency` defaults to THB and is at most 12
-  characters; `owner_scope` is personal, solo_empire, venture, client or shared (default
-  personal); `source` defaults to `manual`; `metadata` is a JSON object; unknown fields are
+  allowed, the direction comes from the type); `currency` defaults to THB (ISO 4217); `scope` is a free label (default empty); `source` defaults to `manual`; `metadata` is a JSON object; unknown fields are
   refused.
 - No uniqueness rule: the same payment can be recorded twice. `account_id` and `subscription_id`
   are not foreign keys and are not checked against the other services.

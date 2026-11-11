@@ -26,14 +26,14 @@ def test_list_filters_by_account_id(client, owner):
     ]
 
 
-def test_list_filters_by_category_and_owner_scope(client, owner):
-    food = create(client, owner, category="food", owner_scope="client").json()
-    create(client, owner, category="food", owner_scope="personal")
-    create(client, owner, category="rent", owner_scope="client")
+def test_list_filters_by_category_and_scope(client, owner):
+    food = create(client, owner, category="food", scope="client").json()
+    create(client, owner, category="food", scope="personal")
+    create(client, owner, category="rent", scope="client")
     listed = client.get(
         TRANSACTIONS,
         headers=owner,
-        params={"category": "food", "owner_scope": "client"},
+        params={"category": "food", "scope": "client"},
     )
     assert ids(listed) == [food["id"]]
 
@@ -92,12 +92,12 @@ def test_stats_count_transactions_per_account(client, owner):
 
 
 def test_stats_can_be_narrowed_by_another_filter(client, owner):
-    create(client, owner, transaction_type="income", owner_scope="venture")
-    create(client, owner, transaction_type="expense", owner_scope="personal")
+    create(client, owner, transaction_type="income", scope="venture")
+    create(client, owner, transaction_type="expense", scope="personal")
     stats = client.get(
         f"{TRANSACTIONS}/stats",
         headers=owner,
-        params={"group_by": "transaction_type", "owner_scope": "venture"},
+        params={"group_by": "transaction_type", "scope": "venture"},
     )
     assert stats.json()["groups"] == {"income": 1}
 
@@ -117,7 +117,7 @@ def test_patching_a_transaction_bumps_its_version(client, owner):
         path, headers=owner, json={"amount": 12.5, "category": "food"}
     )
     assert changed.status_code == 200, changed.text
-    assert changed.json()["amount"] == 12.5
+    assert changed.json()["amount"] == "12.5000"
     assert changed.json()["category"] == "food"
     assert changed.json()["version"] == 2
 
@@ -136,7 +136,7 @@ def test_a_stale_expected_version_is_refused(client, owner):
     client.patch(path, headers=owner, json={"amount": 1})
     stale = client.patch(path, headers=owner, json={"amount": 2, "expected_version": 1})
     assert stale.status_code == 409, stale.text
-    assert client.get(path, headers=owner).json()["amount"] == 1
+    assert client.get(path, headers=owner).json()["amount"] == "1.0000"
 
 
 def test_deleting_a_transaction_removes_it(client, owner):

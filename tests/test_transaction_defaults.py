@@ -10,7 +10,7 @@ def test_new_transaction_defaults_to_personal_thb_manual(client, owner):
     assert response.status_code == 201, response.text
     transaction = response.json()
     assert transaction["currency"] == "THB"
-    assert transaction["owner_scope"] == "personal"
+    assert transaction["scope"] == ""
     assert transaction["source"] == "manual"
     assert transaction["version"] == 1
     assert transaction["account_id"] is None
@@ -19,10 +19,10 @@ def test_new_transaction_defaults_to_personal_thb_manual(client, owner):
 
 def test_defaults_can_be_overridden(client, owner):
     transaction = create(
-        client, owner, currency="USD", owner_scope="venture", source="import"
+        client, owner, currency="USD", scope="venture", source="import"
     ).json()
     assert transaction["currency"] == "USD"
-    assert transaction["owner_scope"] == "venture"
+    assert transaction["scope"] == "venture"
     assert transaction["source"] == "import"
 
 
@@ -44,7 +44,7 @@ def test_account_and_subscription_ids_are_not_checked_against_other_services(
 
 
 def test_amount_keeps_its_decimal_value(client, owner):
-    assert create(client, owner, amount=1234.56).json()["amount"] == 1234.56
+    assert create(client, owner, amount=1234.56).json()["amount"] == "1234.5600"
 
 
 def test_an_import_keeps_the_old_id(client, owner):
