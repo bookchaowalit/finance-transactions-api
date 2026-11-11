@@ -37,6 +37,8 @@ resources:
         type: currency
         default: THB
       account_id:
+        references: finance-accounts.account
+        refuse_status: [closed]
         type: bigint
       scope:
         type: text
@@ -52,6 +54,8 @@ resources:
         type: text
         default: manual
       subscription_id:
+        references: subscriptions.subscription
+        refuse_status: [cancelled, expired]
         type: bigint
       metadata:
         type: json
