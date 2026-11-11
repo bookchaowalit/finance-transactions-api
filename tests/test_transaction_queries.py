@@ -114,7 +114,9 @@ def test_patching_a_transaction_bumps_its_version(client, owner):
     transaction = create(client, owner, amount=10).json()
     path = f"{TRANSACTIONS}/{transaction['id']}"
     changed = client.patch(
-        path, headers=owner, json={"amount": 12.5, "category": "food"}
+        path,
+        headers=owner,
+        json={"amount": 12.5, "category": "food", "expected_version": 1},
     )
     assert changed.status_code == 200, changed.text
     assert changed.json()["amount"] == "12.5000"
@@ -125,7 +127,11 @@ def test_patching_a_transaction_bumps_its_version(client, owner):
 def test_a_patch_that_changes_nothing_keeps_the_version(client, owner):
     transaction = create(client, owner, amount=10, category="food").json()
     path = f"{TRANSACTIONS}/{transaction['id']}"
-    same = client.patch(path, headers=owner, json={"amount": 10, "category": "food"})
+    same = client.patch(
+        path,
+        headers=owner,
+        json={"amount": 10, "category": "food", "expected_version": 1},
+    )
     assert same.status_code == 200, same.text
     assert same.json()["version"] == 1
 
@@ -133,7 +139,7 @@ def test_a_patch_that_changes_nothing_keeps_the_version(client, owner):
 def test_a_stale_expected_version_is_refused(client, owner):
     transaction = create(client, owner).json()
     path = f"{TRANSACTIONS}/{transaction['id']}"
-    client.patch(path, headers=owner, json={"amount": 1})
+    client.patch(path, headers=owner, json={"amount": 1, "expected_version": 1})
     stale = client.patch(path, headers=owner, json={"amount": 2, "expected_version": 1})
     assert stale.status_code == 409, stale.text
     assert client.get(path, headers=owner).json()["amount"] == "1.0000"
