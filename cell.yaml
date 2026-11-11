@@ -5,6 +5,8 @@ cell: transactions
 title: Transactions
 resources:
   transaction:
+    legacy_columns:
+      scope: owner_scope
     filters:
     - account_id
     - category
