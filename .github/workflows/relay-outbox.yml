@@ -50,6 +50,11 @@ jobs:
           TRANSACTIONS_KAFKA_CA_PEM: ${{ secrets.TRANSACTIONS_KAFKA_CA_PEM }}
           TRANSACTIONS_KAFKA_USERNAME: ${{ secrets.TRANSACTIONS_KAFKA_USERNAME }}
           TRANSACTIONS_KAFKA_PASSWORD: ${{ secrets.TRANSACTIONS_KAFKA_PASSWORD }}
+          # SPEC-002 signed events: the signing seed is a secret; the pinned public keys and the
+          # mode (off/report/enforce) are repository variables. Unset = unsigned, unchecked.
+          TRANSACTIONS_EVENT_SIGNING_KEY: ${{ secrets.TRANSACTIONS_EVENT_SIGNING_KEY }}
+          TRANSACTIONS_EVENT_KEYS: ${{ vars.TRANSACTIONS_EVENT_KEYS }}
+          TRANSACTIONS_EVENT_SIGNATURES: ${{ vars.TRANSACTIONS_EVENT_SIGNATURES }}
         run: |
           set +e
           .venv/bin/transactions-relay > "$RUNNER_TEMP/relay.json" 2> "$RUNNER_TEMP/relay.err"
