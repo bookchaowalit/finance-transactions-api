@@ -5,6 +5,10 @@ The `verify` skill follows this file. The checks are the ones CI runs (Python 3.
 ## Checks
 
 ```bash
+# libpq reads these even when the fixtures pass a Unix socket: a set PGHOSTADDR can send the
+# throwaway-cluster bootstrap and migrate to a real server. Clear them first.
+unset PGHOST PGHOSTADDR PGPORT PGUSER PGPASSWORD PGDATABASE PGSERVICE PGSERVICEFILE PGPASSFILE \
+      PGOPTIONS PGSSLMODE DATABASE_URL SENTRY_DSN
 uv sync --frozen --all-extras --python 3.12
 .venv/bin/mypy .
 uvx ruff@0.17.1 check . && uvx ruff@0.17.1 format --check .
