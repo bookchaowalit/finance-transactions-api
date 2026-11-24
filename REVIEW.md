@@ -8,15 +8,18 @@ review. Owner-written; keep it under 16 KiB.
 Treat these as `[P0]`/`[P1]`:
 
 - **Money**: `numeric(19,4)` returned as JSON strings; more than 4 decimals, NaN or Infinity -> 422;
-  ISO 4217 currency enforced by a DB CHECK (`specs/003-saas-money-currency-scope/spec.md`).
+  currency checked by a DB CHECK for format only (`^[A-Z]{3}$`; `ZZZ` is accepted by design, not a
+  finding) (`specs/003-saas-money-currency-scope/spec.md`).
 - **Lost money edits**: a PATCH with a money field and no `expected_version` must get 428
   (`specs/009-money-patch-version/spec.md`).
 - **Workspace isolation** through RLS (`migrations/0001_transactions.sql`); erase touches only the
   caller's workspace (`specs/008-workspace-erase/spec.md`).
-- **References**: cross-cell references fail closed with 503 `references_unavailable`; a referenced
-  record cannot be deleted (409 `has_dependents`) (`specs/006-cross-service-references/spec.md`).
+- **References** (`specs/006-cross-service-references/spec.md`): an id already known in the
+  workspace's `ref_targets` is accepted without Kafka; 503 `references_unavailable` only when the id
+  is unknown and the reference data cannot be read (AC-04), or a delete of a `referenced_by` record
+  cannot check its dependents; a referenced record cannot be deleted (409 `has_dependents`).
 - **Outbox**: written in the same transaction as the record; events carry no amounts or free text
-  (`specs/005-finance-events-kafka/spec.md`).
+  (`specs/005-finance-events-kafka/spec.md`). `scope` and `currency` in `graph` are allowed by AC-02.
 - **Double recording**: only `Idempotency-Key` on create and the unique `legacy_id` (409) prevent
   duplicates; weakening either is `[P1]`.
 - **Migrations**: append-only; an edited applied file, or code that needs a migration not yet applied
